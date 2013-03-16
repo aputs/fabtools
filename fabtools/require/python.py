@@ -26,6 +26,13 @@ from fabtools.python_distribute import (
     is_distribute_installed,
 )
 
+from fabtools.system import (
+    is_debian,
+    is_redhat
+)
+
+from fabtools.require.rpm import packages as require_rpm_packages
+from fabtools.require.deb import packages as require_deb_packages
 
 DEFAULT_PIP_VERSION = '1.2.1'
 
@@ -37,12 +44,11 @@ def distribute():
     .. _distribute: http://packages.python.org/distribute/
     """
 
-    from fabtools.require.deb import packages as require_packages
+    if is_debian():
+      require_deb_packages(['curl', 'python-dev'])
+    if is_redhat():
+      require_rpm_packages(['curl', 'python-devel'])
 
-    require_packages([
-        'curl',
-        'python-dev',
-    ])
     if not is_distribute_installed():
         install_distribute()
 
