@@ -75,3 +75,26 @@ def get_arch():
     with settings(hide('running', 'stdout')):
         arch = run('uname -m')
         return arch
+
+def is_redhat():
+    """
+    Check if the host system is CentOS based.
+
+    """
+    with settings(hide('running', 'stdout')):
+        release_id = run('lsb_release --id --short')
+        if release_id.lower() in ['centos', 'fedora', 'redhat']:
+            return True
+    return False
+
+
+def is_debian():
+    """
+    Check if the host system is Debian based.
+
+    """
+    with settings(hide('running', 'stdout')):
+        release_id = run('lsb_release --id --short')
+        if release_id.lower() in ['debian', 'ubuntu']:
+            return True
+    return False
