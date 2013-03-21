@@ -11,13 +11,13 @@ from __future__ import with_statement
 from fabric.utils import puts
 
 from fabtools.deb import (
-    distrib_codename,
     install,
     is_installed,
     uninstall,
     update_index,
 )
 from fabtools.files import is_file, watch
+from fabtools.system import distrib_codename
 from fabtools.utils import run_as_root
 
 
@@ -66,7 +66,7 @@ def ppa(name):
 
     if not is_file(source):
         package('python-software-properties')
-        run_as_root('add-apt-repository %s' % name)
+        run_as_root('add-apt-repository %s' % name, pty=False)
         update_index()
 
 

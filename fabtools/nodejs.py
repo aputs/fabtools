@@ -20,6 +20,7 @@ except ImportError:
 
 from fabric.api import cd, hide, run, settings
 
+from fabtools.system import cpus, distrib_family
 from fabtools.utils import run_as_root
 
 
@@ -41,20 +42,30 @@ def install_from_source(version=DEFAULT_VERSION):
 
     """
 
-    from fabtools.require.deb import packages as require_packages
+    from fabtools.require.deb import packages as require_deb_packages
+    from fabtools.require.rpm import packages as require_rpm_packages
     from fabtools.require import file as require_file
 
-    require_packages([
-        'build-essential',
-        'python',
-        'libssl-dev',
-    ])
+    family = distrib_family()
+
+    if family == 'debian':
+        require_deb_packages([
+            'build-essential',
+            'libssl-dev',
+            'python',
+        ])
+
+    elif family == 'redhat':
+        require_rpm_packages([
+            'gcc',
+            'gcc-c++',
+            'make',
+            'openssl-devel',
+            'python',
+        ])
 
     filename = 'node-v%s.tar.gz' % version
     foldername = filename[0:-7]
-
-    res = run('python -c "import multiprocessing ; print(multiprocessing.cpu_count())"')
-    cpus = int(res)
 
     require_file(url='http://nodejs.org/dist/v%(version)s/%(filename)s' % {
         'version': version,
@@ -63,7 +74,7 @@ def install_from_source(version=DEFAULT_VERSION):
     run('tar -xzf %s' % filename)
     with cd(foldername):
         run('./configure')
-        run('make -j%d' % (cpus + 1))
+        run('make -j%d' % (cpus() + 1))
         run_as_root('make install')
     run('rm -rf %(filename)s %(foldername)s' % locals())
 
@@ -74,7 +85,7 @@ def version():
 
     Returns ``None`` if it is not installed.
     """
-    with settings(hide('running', 'stdout'), warn_only=True):
+    with settings(hide('running', 'stdout', 'warnings'), warn_only=True):
         res = run('/usr/local/bin/node --version')
     if res.failed:
         return None
@@ -103,9 +114,9 @@ def install_package(package, version=None, local=False):
         package += '@%s' % version
 
     if local:
-        run('npm install -l %s' % package)
+        run('/usr/local/bin/npm install -l %s' % package)
     else:
-        run_as_root('HOME=/root npm install -g %s' % package)
+        run_as_root('HOME=/root /usr/local/bin/npm install -g %s' % package)
 
 
 def install_dependencies():
@@ -125,7 +136,7 @@ def install_dependencies():
             nodejs.install_dependencies()
 
     """
-    run('npm install')
+    run('/usr/local/bin/npm install')
 
 
 def package_version(package, local=False):
@@ -143,7 +154,7 @@ def package_version(package, local=False):
     options = ' '.join(options)
 
     with hide('running', 'stdout'):
-        res = run('npm list %s' % options)
+        res = run('/usr/local/bin/npm list %s' % options)
 
     dependencies = json.loads(res)['dependencies']
     pkg_data = dependencies.get(package)
@@ -160,9 +171,9 @@ def update_package(package, local=False):
     If *local* is ``True``, the package will be updated locally.
     """
     if local:
-        run('npm update -l %s' % package)
+        run('/usr/local/bin/npm update -l %s' % package)
     else:
-        run_as_root('HOME=/root npm update -g %s' % package)
+        run_as_root('HOME=/root /usr/local/bin/npm update -g %s' % package)
 
 
 def uninstall_package(package, version=None, local=False):
@@ -186,6 +197,6 @@ def uninstall_package(package, version=None, local=False):
         package += '@%s' % version
 
     if local:
-        run('npm uninstall -l %s' % package)
+        run('/usr/local/bin/npm uninstall -l %s' % package)
     else:
-        run_as_root('HOME=/root npm uninstall -g %s' % package)
+        run_as_root('HOME=/root /usr/local/bin/npm uninstall -g %s' % package)
