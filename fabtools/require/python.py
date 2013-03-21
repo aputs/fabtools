@@ -27,14 +27,6 @@ from fabtools.python_distribute import (
 )
 from fabtools.system import distrib_family
 
-from fabtools.system import (
-    is_debian,
-    is_redhat
-)
-
-from fabtools.require.rpm import packages as require_rpm_packages
-from fabtools.require.deb import packages as require_deb_packages
-
 DEFAULT_PIP_VERSION = '1.3.1'
 
 
