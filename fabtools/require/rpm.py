@@ -112,13 +112,13 @@ def repository(name):
         epel_version = '6-8'
     elif release == 5:
         epel_version = '5-4'
-    if name == 'rpmforge' and arch == 'i386':
+    if name == 'rpmforge' and release == 6 and arch == 'i386':
         arch = 'i686'
     supported = {
         'rpmforge': {
             '%(arch)s' % locals(): {
-                '6': '%(rpmforge_url)s-%(rpmforge_version)s.el6.rf.i686.rpm' % locals(),
-                '5': '%(rpmforge_url)s-%(rpmforge_version)s.el5.rf.x86_64.rpm' % locals(),
+                '6': '%(rpmforge_url)s-%(rpmforge_version)s.el6.rf.%(arch)s.rpm' % locals(),
+                '5': '%(rpmforge_url)s-%(rpmforge_version)s.el5.rf.%(arch)s.rpm' % locals(),
             },
         },
         'epel': {
