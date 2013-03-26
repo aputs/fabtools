@@ -121,6 +121,12 @@ def repository(name):
                 '5': '%(rpmforge_url)s-%(rpmforge_version)s.el5.rf.%(arch)s.rpm' % locals(),
             },
         },
+        'rpmfusion-free': {
+            '%(arch)s' % locals(): {
+                '5': 'http://download1.rpmfusion.org/free/el/updates/5/i386/rpmfusion-free-release-5-1.noarch.rpm',
+                '6': 'http://download1.rpmfusion.org/free/el/updates/6/i386/rpmfusion-free-release-6-1.noarch.rpm',
+            }
+        },
         'epel': {
             '%(arch)s' % locals(): {
                 '6': '%(epel_url)s/6/%(arch)s/epel-release-%(epel_version)s.noarch.rpm' % locals(),
@@ -128,12 +134,16 @@ def repository(name):
             }
         },
     }
+    rpmfusion_extra = ''
+    if release == 6:
+      rpmfusion_extra = '-6'
     keys = {
         'rpmforge': 'http://apt.sw.be/RPM-GPG-KEY.dag.txt',
+        'rpmfusion-free': "http://rpmfusion.org/keys?action=AttachFile&do=view&target=RPM-GPG-KEY-rpmfusion-free-el%(rpmfusion_extra)s" % locals(),
         'epel': '%(epel_url)s/RPM-GPG-KEY-EPEL-%(release)s' % locals(),
     }
     repo = supported[name][str(arch)][str(release)]
     key = keys[name]
-    with settings(hide('warnings'), warn_only=True):
+    with settings(hide('running', 'warnings', 'stderr', 'stdout'), warn_only=False):
         run_as_root('rpm --import %(key)s' % locals())
         run_as_root('rpm -Uh %(repo)s' % locals())
