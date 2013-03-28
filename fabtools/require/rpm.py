@@ -144,6 +144,6 @@ def repository(name):
     }
     repo = supported[name][str(arch)][str(release)]
     key = keys[name]
-    with settings(hide('running', 'warnings', 'stderr', 'stdout'), warn_only=False):
+    with settings(hide('running', 'warnings', 'stderr', 'stdout'), warn_only=True):
         run_as_root('rpm --import %(key)s' % locals())
         run_as_root('rpm -Uh %(repo)s' % locals())
