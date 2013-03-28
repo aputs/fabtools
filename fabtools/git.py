@@ -51,7 +51,7 @@ def clone(remote_url, path=None, use_sudo=False, user=None):
         run(cmd)
 
 
-def pull(path, use_sudo=False, user=None):
+def pull(path, use_sudo=False, user=None, stash=False):
     """ Pull from a remote Git repository on an existing working copy.
 
     :param path: Path of the working copy directory.  This directory must exist
@@ -66,6 +66,10 @@ def pull(path, use_sudo=False, user=None):
     :param user: If ``use_sudo is True``, run :func:`fabric.operations.sudo`
                  with the given user.  If ``use_sudo is False`` this parameter
                  has no effect.
+
+    :type stash: bool
+    :param stash: If ``stash is True``, run git stash first.
+
     :type user: str
     """
 
@@ -74,6 +78,8 @@ def pull(path, use_sudo=False, user=None):
                          "remote repository.")
 
     cmd = 'git pull'
+    if stash:
+      cmd = "(git stash; %s)" % cmd
 
     with cd(path):
         if use_sudo and user is None:

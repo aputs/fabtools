@@ -14,7 +14,7 @@ from fabtools import git
 from fabtools.files import is_dir
 
 
-def working_copy(remote_url, path=None, branch="master", update=True,
+def working_copy(remote_url, path=None, branch="master", update=True, stash=True,
                  use_sudo=False, user=None):
     """
     Require a working copy of the repository from the ``remote_url``.
@@ -56,7 +56,7 @@ def working_copy(remote_url, path=None, branch="master", update=True,
 
     if is_dir(path, use_sudo=use_sudo) and update:
         # git pull
-        git.pull(path=path, use_sudo=use_sudo, user=user)
+        git.pull(path=path, use_sudo=use_sudo, user=user, stash=stash)
 
     elif is_dir(path, use_sudo=use_sudo) and not update:
         # do nothing
